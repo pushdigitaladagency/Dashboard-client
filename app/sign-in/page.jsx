@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -23,8 +22,8 @@ export default function SignInPage() {
   const router = useRouter();
   const { login, isAuthenticated, hydrated } = useAuth();
 
-  const [email, setEmail] = useState('admin@demo.com');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -97,13 +96,6 @@ export default function SignInPage() {
           slotProps={{ inputLabel: { shrink: true } }}
         />
 
-        <Typography
-          variant="body2"
-          sx={{ mb: 1.5, color: 'text.secondary', cursor: 'pointer', alignSelf: 'flex-end' }}
-        >
-          Forgot password?
-        </Typography>
-
         <TextField
           fullWidth
           label="Password"
@@ -140,18 +132,6 @@ export default function SignInPage() {
         </Button>
       </Box>
 
-      {/* Divider with RBAC label */}
-      <Divider sx={{ my: 3, '&::before, &::after': { borderTopStyle: 'dashed' } }}>
-        <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-          RBAC
-        </Typography>
-      </Divider>
-
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Typography variant="caption" color="text.secondary">
-          Admin: admin@demo.com / Admin@123
-        </Typography>
-      </Box>
     </AuthLayout>
   );
 }

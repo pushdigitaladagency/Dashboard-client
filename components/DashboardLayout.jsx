@@ -337,6 +337,39 @@ function AccountPopover() {
 export default function DashboardLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
+  // Re-check the live role against this session's token. JWTs are stateless, so an
+  // admin whose role was changed to employee (or deactivated) still holds an admin
+  // token until it expires. If the server no longer treats them as admin, force a
+  // logout so they can't keep using the admin dashboard.
+  useEffect(() => {
+    if (!user) return undefined;
+    let active = true;
+
+    (async () => {
+      try {
+        const res = await api.get('/emp/profile');
+        const liveRole = res.data?.role;
+        const liveStatus = res.data?.status;
+        if (
+          active &&
+          user.role === 'admin' &&
+          ((liveRole && liveRole !== 'admin') || liveStatus === 'inactive')
+        ) {
+          logout();
+          router.push('/sign-in');
+        }
+      } catch {
+        // Ignore transient errors — don't log the user out on a failed check.
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [user, logout, router]);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>

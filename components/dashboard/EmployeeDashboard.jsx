@@ -8,15 +8,21 @@ import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
 import Alert from '@mui/material/Alert';
 import Table from '@mui/material/Table';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
 import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import TableRow from '@mui/material/TableRow';
+import TextField from '@mui/material/TextField';
 import TableBody from '@mui/material/TableBody';
 import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
+import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import TableContainer from '@mui/material/TableContainer';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -81,6 +87,12 @@ export default function EmployeeDashboard() {
   const [error, setError] = useState(null);
   const [avatarSrc, setAvatarSrc] = useState('');
 
+  // Update-phone dialog state
+  const [phoneOpen, setPhoneOpen] = useState(false);
+  const [phoneValue, setPhoneValue] = useState('');
+  const [phoneSaving, setPhoneSaving] = useState(false);
+  const [phoneError, setPhoneError] = useState(null);
+
   // Profile image is stored locally (no server upload endpoint exists). Key it by
   // user so different accounts on the same browser don't share an image. Read after
   // mount to avoid a hydration mismatch.
@@ -91,6 +103,32 @@ export default function EmployeeDashboard() {
     const stored = localStorage.getItem(avatarKey);
     if (stored) setAvatarSrc(stored);
   }, [avatarKey]);
+
+  const openPhoneDialog = () => {
+    setPhoneValue(profile?.phone || '');
+    setPhoneError(null);
+    setPhoneOpen(true);
+  };
+
+  const handleSavePhone = async () => {
+    const next = phoneValue.trim();
+    if (!next) {
+      setPhoneError('Phone number is required.');
+      return;
+    }
+    setPhoneSaving(true);
+    setPhoneError(null);
+    try {
+      // Backend allows employees to update only their phone (PUT /emp/profile).
+      await api.put('/emp/profile', { phone: next });
+      setProfile((prev) => ({ ...prev, phone: next }));
+      setPhoneOpen(false);
+    } catch (err) {
+      setPhoneError(err instanceof Error ? err.message : 'Failed to update phone number.');
+    } finally {
+      setPhoneSaving(false);
+    }
+  };
 
   const handleAvatarPick = (e) => {
     const file = e.target.files?.[0];
@@ -293,6 +331,16 @@ export default function EmployeeDashboard() {
             <InfoRow label="Department" value={profile?.department} />
             <InfoRow label="Designation" value={profile?.designation} />
             <InfoRow label="Joined" value={formatDate(profile?.join_date)} />
+
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<Icon icon="solar:phone-bold" width={16} />}
+              onClick={openPhoneDialog}
+              sx={{ mt: 2 }}
+            >
+              Update Phone
+            </Button>
           </Card>
         </Grid>
 
@@ -397,6 +445,48 @@ export default function EmployeeDashboard() {
           </Card>
         </Grid>
       </Grid>
+
+      {/* ── Update Phone Dialog ── */}
+      <Dialog
+        open={phoneOpen}
+        onClose={() => setPhoneOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{ paper: { sx: { borderRadius: 2 } } }}
+      >
+        <DialogTitle>Update Phone Number</DialogTitle>
+        <DialogContent>
+          {phoneError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {phoneError}
+            </Alert>
+          )}
+          <TextField
+            fullWidth
+            label="Phone"
+            value={phoneValue}
+            onChange={(e) => setPhoneValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSavePhone();
+            }}
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={() => setPhoneOpen(false)} color="inherit" disabled={phoneSaving}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSavePhone}
+            variant="contained"
+            color="inherit"
+            disabled={phoneSaving}
+            startIcon={phoneSaving ? <CircularProgress size={16} color="inherit" /> : null}
+          >
+            {phoneSaving ? 'Saving...' : 'Save'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
