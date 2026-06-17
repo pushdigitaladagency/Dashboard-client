@@ -1,7 +1,6 @@
 'use client';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -51,9 +50,6 @@ export default function AuthLayout({ children }) {
             </Typography>
           </Box>
 
-          <Link href="#" underline="hover" color="inherit" sx={{ typography: 'subtitle2' }}>
-            Need help?
-          </Link>
         </Toolbar>
       </AppBar>
 
