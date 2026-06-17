@@ -8,8 +8,19 @@
     "start": "next start"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.14.1",
+    "@iconify/react": "^6.0.2",
+    "@mui/icons-material": "^9.1.1",
+    "@mui/material": "^9.1.1",
+    "apexcharts": "^5.15.0",
+    "es-toolkit": "^1.47.1",
+    "minimal-shared": "^1.1.6",
     "next": "16.2.9",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-apexcharts": "^2.1.0",
+    "react-dom": "19.2.4",
+    "simplebar-react": "^3.3.2"
   }
 }
