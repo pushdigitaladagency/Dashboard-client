@@ -3,7 +3,9 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 // ─── API base ────────────────────────────────────────────────────────────────
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://63.141.242.203:6001';
+// Same-origin proxy path (see rewrites in next.config.js). Keeps all API calls on
+// the app's own HTTPS origin so they aren't blocked as mixed content on Vercel.
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/proxy';
 
 function getToken() {
   if (typeof window === 'undefined') return null;
